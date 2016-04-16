@@ -107,6 +107,9 @@ AppDispatcher.register(function(action) {
       remove(action.id);
       CMStore.emitChange();
       break;
+    case CMConstants.CM_OPEN_MODAL:
+      CMStore.emitChange();
+      break;
 
     default:
       // no op

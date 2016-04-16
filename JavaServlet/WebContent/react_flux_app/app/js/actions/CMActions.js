@@ -11,7 +11,7 @@ var CMActions = {
       dataType: 'json',
       type: 'GET',
       success: function(data) {
-
+        console.log(data.length);
         data.forEach(function(obj) {
 
           var avatar = 'img/faces/love_java.jpg';
@@ -33,11 +33,9 @@ var CMActions = {
 
    },
 
-  create: function(newContact) {
-
-    console.log('CREATE');
-    console.log(newContact);
+  create: function(newContact, then) {
   	var avatar = 'img/faces/love_java.jpg';
+    var message = '';
   	newContact.avatar = avatar;
       $.ajax({
         url: 'http://localhost:8080/JavaServlet/insert',
@@ -46,19 +44,24 @@ var CMActions = {
         data: newContact,
         success: function(data) {
           console.log(data);
-          AppDispatcher.dispatch({
-                actionType: CMConstants.CM_CREATE,
-                id : data,
-                name: newContact.name,
-                phone: newContact.phone,
-                email: newContact.email,
-                avatar: newContact.avatar
-              });
+            if(data.length < 10){
+              AppDispatcher.dispatch({
+                    actionType: CMConstants.CM_CREATE,
+                    id : data,
+                    name: newContact.name,
+                    phone: newContact.phone,
+                    email: newContact.email,
+                    avatar: newContact.avatar
+                  });
+            }else{
+              console.log(data);
+            }
         }.bind(this),
         error: function(xhr, status, err) {
           console.error('http://localhost:8080/JavaServlet/insert', status, err.toString());
         }.bind(this)
       });
+      return message;
   },
 
 
@@ -75,7 +78,6 @@ var CMActions = {
 
 
   save: function(contact) {
-
     var avatar = 'img/faces/love_java.jpg';
     contact.avatar = avatar;
       $.ajax({
@@ -84,15 +86,19 @@ var CMActions = {
         type: 'POST',
         data: contact,
         success: function(data) {
-          console.log(contact);
-          AppDispatcher.dispatch({
-              actionType: CMConstants.CM_SAVE,
-              id: contact.id,
-              name: contact.name,
-              phone: contact.phone,
-              email: contact.email,
-              avatar: contact.avatar
-        });
+          if(data.length < 10){
+            AppDispatcher.dispatch({
+                actionType: CMConstants.CM_SAVE,
+                id: contact.id,
+                name: contact.name,
+                phone: contact.phone,
+                email: contact.email,
+                avatar: contact.avatar
+          });
+        }else{
+          console.log(data);
+        }
+
         }.bind(this),
         error: function(xhr, status, err) {
           console.error('http://localhost:8080/JavaServlet/update', status, err.toString());
@@ -102,11 +108,42 @@ var CMActions = {
 
 
 
-  _remove: function(removeId) {
-    AppDispatcher.dispatch({
-      actionType: CMConstants.CM_REMOVE,
-      id: removeId
+  _remove: function(contact) {
+    $.ajax({
+      url: 'http://localhost:8080/JavaServlet/delete',
+      dataType: 'text',
+      type: 'POST',
+      data: contact,
+      success: function(data) {
+        AppDispatcher.dispatch({
+          actionType: CMConstants.CM_REMOVE,
+          id: contact.id
+        });
+
+      }.bind(this),
+      error: function(xhr, status, err) {
+        console.error('http://localhost:8080/JavaServlet/delete', status, err.toString());
+      }.bind(this)
     });
+  },
+
+   _whatIsIt: function(object) {
+    var stringConstructor = "test".constructor;
+    var arrayConstructor = [].constructor;
+    var objectConstructor = {}.constructor;
+      if (object === null) {
+          return "null";
+      }else if (object === undefined) {
+          return "undefined";
+      }else if (object.constructor === stringConstructor) {
+          return "String";
+      }else if (object.constructor === arrayConstructor) {
+          return "Array";
+      }else if (object.constructor === objectConstructor) {
+          return "Object";
+      }else {
+          return "Integer";
+      }
   }
 
 };

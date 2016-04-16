@@ -61,10 +61,12 @@ var EditContactModal = React.createClass({
 
 	_removeContact: function(e) {
 		e.preventDefault();
-		var removeId = $('#edit_contact_form').find('#contact_id').val();
+		var contact = {};
+
+		contact.id = $('#edit_contact_form').find('#contact_id').val();
 
 
-		CMActions._remove(removeId);
+		CMActions._remove(contact);
 
 		this._clearContactForm();
 	},

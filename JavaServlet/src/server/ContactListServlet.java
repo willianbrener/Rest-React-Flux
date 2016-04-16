@@ -13,31 +13,35 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.google.gson.Gson;
 
+import controller.ContactController;
 import model.Contact;
-import util.Conexao;
+import util.Return;
 
 @SuppressWarnings("serial")
 public class ContactListServlet extends HttpServlet {
-
+	List<Contact> contacts = new ArrayList<Contact>();
+	ContactController controller;
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		response.setContentType("application/json");
-
-		/* USANDO A BIBLIOTECA GON DO GOOGLE PARA MANIPULAR OS JSON'S */
+		Return ret = new Return(true);
 
 		Gson gson = new Gson();
-		List<Contact> contacts = new ArrayList<Contact>();
-		ContactDAO dao = new ContactDAO(Conexao.fabricar());
-		try {
-			contacts = dao.listarTodos();
-
-		} catch (Exception e) {
-			e.printStackTrace();
+		controller = new ContactController();
+		
+		ret = controller.listarTodos();
+		
+		if(ret.getList() != null && ret.getList().size() > 0){
+			String json = gson.toJson(ret.getList());
+			PrintWriter out = response.getWriter();
+			out.print(json);
+			out.flush();
+			
+		}else{
+			
 		}
-		String json = gson.toJson(contacts);
-		PrintWriter out = response.getWriter();
 
-		out.print(json);
-		out.flush();
+
+		
 
 	}
 
@@ -45,4 +49,13 @@ public class ContactListServlet extends HttpServlet {
 		doGet(request, response);
 	}
 
+	public List<Contact> getContacts() {
+		return contacts;
+	}
+
+	public void setContacts(List<Contact> contacts) {
+		this.contacts = contacts;
+	}
+
+	
 }

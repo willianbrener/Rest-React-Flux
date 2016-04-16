@@ -6,6 +6,7 @@ import java.sql.Connection;
 import java.util.List;
 
 import model.Contact;
+import util.Return;
 
 import java.util.ArrayList;
 
@@ -28,7 +29,8 @@ public ContactDAO(Connection con){
 public ContactDAO() {
 }
 
-public void cadastrar(Contact contact) throws Exception {
+public Return cadastrar(Contact contact) throws Exception {
+	Return ret = new Return(true);
    PreparedStatement p =
    con.prepareStatement("insert into contact (name, phone, email) values (?,?,?)");
    p.setString(1, contact.getName());
@@ -36,16 +38,20 @@ public void cadastrar(Contact contact) throws Exception {
    p.setString(3, contact.getEmail());
    p.executeUpdate();
    p.close();
+   return ret;
 }
 
-public void deletar(Contact contact) throws Exception {
+public Return deletar(Contact contact) throws Exception {
+	Return ret = new Return(true);
    PreparedStatement p = con.prepareStatement("delete from contact where id = ?");
    p.setInt(1, contact.getId());
    p.executeUpdate();
    p.close();
+   return ret;
 }
 
-public void update(Contact contact) throws Exception {
+public Return update(Contact contact) throws Exception {
+	Return ret = new Return(true);
    PreparedStatement p = 
    con.prepareStatement("update contact set name = ?, phone = ?, email = ? where id = ?");
    p.setString(1, contact.getName());
@@ -54,9 +60,11 @@ public void update(Contact contact) throws Exception {
    p.setInt(4, contact.getId());
    p.executeUpdate();
    p.close();
+   return ret;
 }
 
-public List<Contact> listarTodos() throws Exception{
+public Return listarTodos() throws Exception{
+	Return ret = new Return(true);
    List<Contact> contacts = new ArrayList<Contact>();
    PreparedStatement p = con.prepareStatement("select * from contact");
    ResultSet rs = p.executeQuery();
@@ -68,29 +76,31 @@ public List<Contact> listarTodos() throws Exception{
 	   contact.setEmail(rs.getString("email"));
 	   contacts.add(contact);
    }
+   ret.setList(contacts);
    rs.close();
    p.close();
-   return contacts;
+   return ret;
 }
 
-public List<Contact> searchById( Contact contact) throws Exception{
+public Return searchById( Contact contact) throws Exception{
+	Return ret = new Return(true);
+	 Contact contactN = new Contact();
 	 List<Contact> contacts = new ArrayList<Contact>();
-	   PreparedStatement p = con.prepareStatement("select * from contact where name = ? and phone = ? and email = ?");
-	   p.setString(1, contact.getName());
-	   p.setString(2, contact.getPhone());
-	   p.setString(3, contact.getEmail());
+	   PreparedStatement p = con.prepareStatement("select * from contact where id = ? ");
+	   p.setInt(1, contact.getId());
 	   ResultSet rs = p.executeQuery();
 	   while(rs.next()){
-		   Contact contactAux = new Contact();
-		   contactAux.setId(rs.getInt("id"));
-		   contactAux.setName(rs.getString("name"));
-		   contactAux.setPhone(rs.getString("phone"));
-		   contactAux.setEmail(rs.getString("email"));
-		   contacts.add(contactAux);
+	   contactN.setId(rs.getInt("id"));
+	   contactN.setName(rs.getString("name"));
+	   contactN.setPhone(rs.getString("phone"));
+	   contactN.setEmail(rs.getString("email"));
+	   contacts.add(contactN);
 	   }
+	   
+	   ret.setList(contacts);
 	   rs.close();
 	   p.close();
-	   return contacts;
+	   return ret;
 	}
 
-}//fim da classe ProdutoDAO
+}

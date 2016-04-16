@@ -6,5 +6,6 @@ module.exports = keyMirror({
   CM_CREATE: null,
   CM_SAVE: null,
   CM_EDIT: null,
-  CM_REMOVE: null
+  CM_REMOVE: null,
+  CM_OPEN_MODAL: null
 });

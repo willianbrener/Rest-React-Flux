@@ -7,40 +7,39 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import controller.ContactController;
 import model.Contact;
-import util.Conexao;
+import util.Return;
 
 @SuppressWarnings("serial")
 public class ContactDeleteServlet extends HttpServlet {
-
+	ContactController controller;
+	Contact contact = new Contact();
 	public void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		response.setContentType("application/json");
-		Contact contact = new Contact();
+		Return ret = new Return(true);
+		controller = new ContactController();
 		
 		contact.setId(Integer.parseInt(request.getParameter("id")));
-		contact.setName(request.getParameter("name"));
-		contact.setPhone(request.getParameter("phone"));
-		contact.setEmail(request.getParameter("email"));
-		
-		System.out.println(contact.getName());
-		System.out.println(contact.getPhone());
-		System.out.println(contact.getEmail());
-		
-		ContactDAO dao = new ContactDAO(Conexao.fabricar());
-		try {
-			dao.update(contact);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		
-		
 
+		ret = controller.deletar(contact);
+		if (ret.isValid()) {
+			
+		}
 	}
 
 	public void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		doGet(request, response);
+	}
+
+	public Contact getContact() {
+		return contact;
+	}
+
+	public void setContact(Contact contact) {
+		this.contact = contact;
 	}
 
 }
